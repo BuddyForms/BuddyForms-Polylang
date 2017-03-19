@@ -46,9 +46,9 @@ add_filter( 'buddyforms_user_posts_query_args', 'buddyforms_polylang_user_posts_
 function buddyforms_polylang_user_posts_query_args( $query_args ){
 	global $buddyforms;
 
-	if( isset( $query_args['form_slug']['polylang']['view_all_languages'] ) ){
+//	if( isset( $query_args['form_slug']['polylang']['view_all_languages'] ) ){
 		$query_args['lang'] = '';
-	}
+//	}
 
 	return $query_args;
 }
@@ -58,9 +58,37 @@ function buddyforms_polylang_user_posts_query_args( $query_args ){
  */
 add_filter( 'buddyforms_form_hero_top', 'buddyforms_polylang_form_hero_top', 10, 2 );
 function buddyforms_polylang_form_hero_top( $form_html, $form_slug ){
-	global $post_id;
+	global $post_id, $polylang;
 
-	$translations = pll_the_languages(array('raw'=>1));
+	$translationIds = $polylang->model->get_translations('post', $post_id);
+
+	$translations = pll_the_languages(array('hide_if_empty'=>0,'raw'=>1));
+
+?>
+
+	<script>
+        jQuery(document).ready(function () {
+            jQuery(document).on("click", '.buddyforms_translate', function (evt) {
+
+                var post_id  = jQuery(this).attr("data-post_id");
+                var lang     = jQuery(this).attr("data-lang");
+
+                jQuery.ajax({
+                    type: 'POST',
+                    url: ajaxurl,
+                    data: {"action": "buddyforms_polylang_new_translation", "post_id": post_id, "lang": lang},
+                    success: function (data) {
+						console.log(data);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+            });
+        });
+	</script>
+<?php
+
 
 	$tmp = __('Post Language: ', 'buddyforms' ) . '<img src="' . $translations[pll_get_post_language( $post_id, 'slug' )]['flag'] . '">';
 
@@ -69,7 +97,14 @@ function buddyforms_polylang_form_hero_top( $form_html, $form_slug ){
 		foreach($languages as $language){
 
 			if($language != pll_get_post_language( $post_id, 'slug' ) ){
-				$tmp .= ' <img src="' . $translations[$language]['flag'] . '""> ' .apply_filters( 'buddyforms_loop_edit_post_link', buddyforms_get_edit_post_link( pll_get_post($post_id, $language) ), pll_get_post($post_id, $language) );
+
+			    $tmp .= ' <img src="' . $translations[$language]['flag'] . '">';
+
+				$edit_link = apply_filters( 'buddyforms_loop_edit_post_link', buddyforms_get_edit_post_link( pll_get_post($post_id, $language) ), pll_get_post($post_id, $language) );
+				$new_link = ' <a data-lang="' . $language . '" data-post_id="' . $post_id . '" href="#" class="buddyforms_translate">' . __( 'Translate', 'buddyforms' ) . '</a>';
+
+				$tmp .= empty( $edit_link ) ? $new_link : $edit_link;
+
 			}
 		}
 
@@ -83,7 +118,7 @@ function buddyforms_polylang_form_hero_top( $form_html, $form_slug ){
 add_action( 'buddyforms_the_loop_item_last', 'buddyforms_polylang_the_loop_item_last' );
 function buddyforms_polylang_the_loop_item_last( $post_id ){
 	$translations = pll_the_languages(array('raw'=>1));
-	echo 'Language: <img src="' . $translations[pll_get_post_language( $post_id, 'slug' )]['flag'] . '">';
+	echo __('Language:', 'buddyforms' ) . '<img src="' . $translations[ pll_get_post_language( $post_id, 'slug' ) ][ 'flag' ] . '">';
 }
 
 /*
@@ -117,4 +152,38 @@ function buddyforms_polylang_form_field_name( $name, $post_id ){
 add_filter( 'buddyforms_form_field_description', 'buddyforms_polylang_form_field_description', 10, 2 );
 function buddyforms_polylang_form_field_description( $description, $post_id ){
 	return pll_translate_string($description, pll_get_post_language( $post_id, 'slug' ));
+}
+
+
+add_action( 'wp_ajax_buddyforms_polylang_new_translation', 'buddyforms_polylang_new_translation' );
+
+function buddyforms_polylang_new_translation(){
+	global $polylang;
+
+	$post_id = $_POST['post_id'];
+	$lang = $_POST['lang'];
+
+	$post = get_post($post_id);
+
+
+
+	$translationIds = $polylang->model->get_translations('post', $post_id);
+
+	// Create post object
+	$my_post = array(
+		'post_title'    => $post->post_title,
+		'post_content'  => $post->post_content,
+		'post_status'   => 'draft',
+		'post_author'   => get_current_user_id(),
+	);
+	$new_translation = wp_insert_post( $my_post );
+
+	if($new_translation){
+		$translationIds[$lang] = $new_translation;
+    }
+
+	pll_save_post_translations($translationIds);
+
+	echo 'ende';
+    die();
 }
