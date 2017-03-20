@@ -73,12 +73,16 @@ function buddyforms_polylang_form_hero_top( $form_html, $form_slug ){
                 var post_id  = jQuery(this).attr("data-post_id");
                 var lang     = jQuery(this).attr("data-lang");
 
+                jQuery("body").LoadingOverlay("show", {
+                    fade  : [2000, 1000]
+                });
+
                 jQuery.ajax({
                     type: 'POST',
                     url: ajaxurl,
                     data: {"action": "buddyforms_polylang_new_translation", "post_id": post_id, "lang": lang},
                     success: function (data) {
-						console.log(data);
+                        window.location.href = data;
                     },
                     error: function (request, status, error) {
                         alert(request.responseText);
@@ -118,7 +122,7 @@ function buddyforms_polylang_form_hero_top( $form_html, $form_slug ){
 add_action( 'buddyforms_the_loop_item_last', 'buddyforms_polylang_the_loop_item_last' );
 function buddyforms_polylang_the_loop_item_last( $post_id ){
 	$translations = pll_the_languages(array('raw'=>1));
-	echo __('Language:', 'buddyforms' ) . '<img src="' . $translations[ pll_get_post_language( $post_id, 'slug' ) ][ 'flag' ] . '">';
+	echo __('Language: ', 'buddyforms' ) . '<img src="' . $translations[ pll_get_post_language( $post_id, 'slug' ) ][ 'flag' ] . '">';
 }
 
 /*
@@ -158,32 +162,44 @@ function buddyforms_polylang_form_field_description( $description, $post_id ){
 add_action( 'wp_ajax_buddyforms_polylang_new_translation', 'buddyforms_polylang_new_translation' );
 
 function buddyforms_polylang_new_translation(){
-	global $polylang;
+	global $polylang, $buddyforms;
 
+	// Get the post id of the form we like to translate
 	$post_id = $_POST['post_id'];
+
+	// Get the language for the new translation
 	$lang = $_POST['lang'];
 
+	// get the post we want to translate
 	$post = get_post($post_id);
 
+	$form_slug = get_post_meta( $post_id, '_bf_form_slug', true);
 
 
+		// Get all translations for the post
 	$translationIds = $polylang->model->get_translations('post', $post_id);
 
-	// Create post object
+	// Create post object for the new post
 	$my_post = array(
-		'post_title'    => $post->post_title,
-		'post_content'  => $post->post_content,
 		'post_status'   => 'draft',
 		'post_author'   => get_current_user_id(),
+        'post_type'     => $post->post_type
 	);
 	$new_translation = wp_insert_post( $my_post );
 
+	// If the new translation was created successfully add the language to the translations
 	if($new_translation){
 		$translationIds[$lang] = $new_translation;
     }
 
+    // Finally create the connection so the post belows to the others and is a real translation
 	pll_save_post_translations($translationIds);
 
-	echo 'ende';
+
+	$parent_tab = buddyforms_members_parent_tab( $buddyforms[ $form_slug ] );
+
+	// Echo the post Id so we can ma a site reload with the new post id
+	echo  bp_loggedin_user_domain() . $parent_tab . '/' . $form_slug . '-edit/' . $new_translation ;
+
     die();
 }
