@@ -58,9 +58,10 @@ function buddyforms_polylang_user_posts_query_args( $query_args ){
  */
 add_filter( 'buddyforms_form_hero_top', 'buddyforms_polylang_form_hero_top', 10, 2 );
 function buddyforms_polylang_form_hero_top( $form_html, $form_slug ){
-	global $post_id, $polylang;
 
-	$translationIds = $polylang->model->get_translations('post', $post_id);
+    global $post_id, $polylang;
+
+    $translationIds = $polylang->model->get_translations('post', $post_id);
 
 	$translations = pll_the_languages(array('hide_if_empty'=>0,'raw'=>1));
 
