@@ -1,0 +1,51 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-21 14:38+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/"
+
+#: loader.php:100
+msgid "Post Language: "
+msgstr ""
+
+#: loader.php:103
+msgid " Edit different language"
+msgstr ""
+
+#: loader.php:111
+msgid "Translate"
+msgstr ""
+
+#: loader.php:128
+msgid "Language: "
+msgstr ""
+
+#. Name of the plugin
+msgid "BuddyForms Polylang"
+msgstr ""
+
+#. Description of the plugin
+msgid "Multilingual Forms with Polylang"
+msgstr ""
+
+#. URI of the plugin
+msgid "http://buddyforms.com/"
+msgstr ""
+
+#. Author of the plugin
+msgid "Sven Lehnert"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://profiles.wordpress.org/svenl77"
+msgstr ""
