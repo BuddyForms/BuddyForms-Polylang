@@ -9,6 +9,8 @@
  * Author URI: https://profiles.wordpress.org/svenl77
  * License: GPLv2 or later
  * Network: false
+ * Text Domain: buddyforms-polylang
+ * Domain Path: /languages
  *
  *****************************************************************************
  *
@@ -95,24 +97,24 @@ function buddyforms_polylang_form_hero_top( $form_html, $form_slug ){
 <?php
 
 
-	$tmp = __('Post Language: ', 'buddyforms' ) . '<img src="' . $translations[pll_get_post_language( $post_id, 'slug' )]['flag'] . '">';
+	$tmp = '<div>'.__('Post Language: ', 'buddyforms-polylang' ) . ' <img src="' . $translations[pll_get_post_language( $post_id, 'slug' )]['flag'] . '"  class="buddyforms-polylang-img-flag"></div>';
 
 	$languages = pll_languages_list($post_id);
-	$tmp .= __(' Edit different language', 'buddyforms');
+	$tmp .= '<div>'.__(' Edit different language', 'buddyforms-polylang');
 		foreach($languages as $language){
 
 			if($language != pll_get_post_language( $post_id, 'slug' ) ){
 
-			    $tmp .= ' <img src="' . $translations[$language]['flag'] . '">';
+			    $tmp .= ' <img src="' . $translations[$language]['flag'] . '" class="buddyforms-polylang-img-flag">';
 
 				$edit_link = apply_filters( 'buddyforms_loop_edit_post_link', buddyforms_get_edit_post_link( pll_get_post($post_id, $language) ), pll_get_post($post_id, $language) );
-				$new_link = ' <a data-lang="' . $language . '" data-post_id="' . $post_id . '" href="#" class="buddyforms_translate">' . __( 'Translate', 'buddyforms' ) . '</a>';
+				$new_link = '<a data-lang="' . $language . '" data-post_id="' . $post_id . '" href="#" class="buddyforms_translate">' . __( 'Translate', 'buddyforms-polylang' ) . '</a>';
 
 				$tmp .= empty( $edit_link ) ? $new_link : $edit_link;
 
 			}
 		}
-
+    $tmp .= '</div>';
 	return $form_html . $tmp;
 }
 
@@ -123,7 +125,7 @@ function buddyforms_polylang_form_hero_top( $form_html, $form_slug ){
 add_action( 'buddyforms_the_loop_item_last', 'buddyforms_polylang_the_loop_item_last' );
 function buddyforms_polylang_the_loop_item_last( $post_id ){
 	$translations = pll_the_languages(array('raw'=>1));
-	echo __('Language: ', 'buddyforms' ) . '<img src="' . $translations[ pll_get_post_language( $post_id, 'slug' ) ][ 'flag' ] . '">';
+	echo __('Language: ', 'buddyforms-polylang' ) . '<img src="' . $translations[ pll_get_post_language( $post_id, 'slug' ) ][ 'flag' ] . '">';
 }
 
 /*
@@ -154,6 +156,8 @@ add_filter( 'buddyforms_form_field_name', 'buddyforms_polylang_form_field_name',
 function buddyforms_polylang_form_field_name( $name, $post_id ){
 	return pll_translate_string($name, pll_get_post_language( $post_id, 'slug' ));
 }
+
+
 add_filter( 'buddyforms_form_field_description', 'buddyforms_polylang_form_field_description', 10, 2 );
 function buddyforms_polylang_form_field_description( $description, $post_id ){
 	return pll_translate_string($description, pll_get_post_language( $post_id, 'slug' ));
@@ -203,4 +207,9 @@ function buddyforms_polylang_new_translation(){
 	echo  bp_loggedin_user_domain() . $parent_tab . '/' . $form_slug . '-edit/' . $new_translation ;
 
     die();
+}
+
+add_action('init', 'load_plugin_textdomain_buddyforms_polylang');
+function load_plugin_textdomain_buddyforms_polylang() {
+    load_plugin_textdomain( 'buddyforms-polylang', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 }
