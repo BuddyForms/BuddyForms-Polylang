@@ -97,7 +97,7 @@ function buddyforms_polylang_form_hero_top( $form_html, $form_slug ){
 <?php
 
 
-	$tmp = '<div>'.__('Post Language: ', 'buddyforms-polylang' ) . ' <img src="' . $translations[pll_get_post_language( $post_id, 'slug' )]['flag'] . '"  class="buddyforms-polylang-img-flag"></div>';
+	$tmp = '<div class="bodyforms-polylang-frontend-edit"><div>'.__('Post Language: ', 'buddyforms-polylang' ) . ' <img src="' . $translations[pll_get_post_language( $post_id, 'slug' )]['flag'] . '"  class="buddyforms-polylang-img-flag"></div>';
 
 	$languages = pll_languages_list($post_id);
 	$tmp .= '<div>'.__(' Edit different language', 'buddyforms-polylang');
@@ -114,7 +114,7 @@ function buddyforms_polylang_form_hero_top( $form_html, $form_slug ){
 
 			}
 		}
-    $tmp .= '</div>';
+    $tmp .= '</div></div>';
 	return $form_html . $tmp;
 }
 
